@@ -33,7 +33,7 @@ sigset_t block_set;
 #define false 0
 #define true 1
 
-#define DUMP_DIR "/tmp/bismark-passive/m111.cap"
+#define DUMP_DIR "/tmp/bismark-passive/w111.cap"
 #define PENDING_UPDATE_FILENAME "/tmp/bismark-passive/current-update.gz"
 #define PENDING_FREQUENT_UPDATE_FILENAME "/tmp/bismark-passive/current-frequent-update"
 #define PENDING_FREQUENT_UPDATE_FILENAME_DELAY "/tmp/bismark-passive/current-frequent-update-delay"
