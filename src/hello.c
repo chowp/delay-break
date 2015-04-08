@@ -424,7 +424,7 @@ static void process_packet(
 
 	memset(&p, 0, sizeof(p));
 	p.len = header->len;
-	parse_packet(bytes,&p);
+	parse_wire_packet(bytes,&p);
 	
 	//fiter
 	//if((str_equal(mac,ether_sprintf(p.wlan_src),2*MAC_LEN) != 1))
