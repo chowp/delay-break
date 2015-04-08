@@ -149,14 +149,14 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 	
 	
 
-	u8 *raw = (u8 *)(buf+r14);
+	u8 *raw = (u8 *)(buf+14);
 	if(((*raw) & 0x60) == 0x40){
 		struct ip* ih;
-		ih = (struct ip*)(buf+radio+hdr+8);
+		ih = (struct ip*)(buf+14);
 		int ipl = ih->ip_hl*4;
 		
-		p->tcp_offset = radio + hdr + llc + ipl;
-		int left_len = p->len - hdr -llc - ipl;
+		p->tcp_offset = 14 + ipl;
+		int left_len = p->len - 14 - ipl;
 		parse_tcp_header(buf+p->tcp_offset,p,left_len);
 	}else{
 		p->tcp_offset = radio + hdr + llc + IPV6; //ipv6
