@@ -159,7 +159,7 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 		int left_len = p->len - 14 - ipl;
 		parse_tcp_header(buf+p->tcp_offset,p,left_len);
 	}else{
-		p->tcp_offset = radio + hdr + llc + IPV6; //ipv6
+		p->tcp_offset = 14 + IPV6; //ipv6
 		/*need to be continue...*/
 	}
 
