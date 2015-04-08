@@ -1,46 +1,40 @@
+# ap-monitor - Highly Optimized Radio Scanning Tool
 #
-# Copyright (C) 2006 OpenWrt.org
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
-# This is free software, licensed under the GNU General Public License v2.
-# See /LICENSE for more information.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-include $(TOPDIR)/rules.mk
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-PKG_NAME:=delay-break
-PKG_VERSION:=1.0
-PKG_RELEASE:=1
+NAME=delay-break
+OBJS=hello.o 
 
-#depend:=libpcap
-#depend+=libpcap
-#	
+CFLAGS+=-Wall -DDO_DEBUG=$(DEBUG) -g -DPCAP
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
-
-include $(INCLUDE_DIR)/package.mk
-
-define Package/delay-break
-	SECTION:=net
-	CATEGORY:=Network
-	DEPENDS:=+libpcap +libpthread
-	TITLE:=Wireless INterference Graph
-endef
+LIBS+=-lpcap -lpthread
 
 
-define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
-	$(CP) ./src/* $(PKG_BUILD_DIR)/
-endef
+buildstamp=.build_debug
+all: $(buildstamp) $(NAME)
+# include dependencies
+hello.o:hello.c 
 
-define Package/delay-break/install
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/delay-break $(1)/usr/sbin  
-endef	
+$(NAME): $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
+clean:
+	-rm -f *.o *~
+	-rm -f $(NAME)
+	-rm -f .build_*
 
-#define Package/hello/install
-#	$(INSTALL_DIR) $(1)/usr/sbin
-#endef
-#$(INSTALL_BIN) $(PKG_BUILD_DIR)/hello $(1)/usr/sbin/
-
-$(eval $(call BuildPackage,delay-break,+libpcap))
-
+$(buildstamp):
+	make clean
+	touch $@
