@@ -100,9 +100,9 @@ struct inf_info {
  store the delay break down info
 ****************/
 struct delay_info {
-	float udelay;
-	float ddelay;
-	float rtt;
+	double time1;
+	double time2;
+	unsigned int tcp_seq;
 };
 struct packet_info {
 	/* general */

@@ -35,10 +35,9 @@ sigset_t block_set;
 
 #define DUMP_DIR "/tmp/bismark-passive/w111.cap"
 #define PENDING_UPDATE_FILENAME "/tmp/bismark-passive/current-update.gz"
-#define PENDING_FREQUENT_UPDATE_FILENAME "/tmp/bismark-passive/current-frequent-update"
 #define PENDING_FREQUENT_UPDATE_FILENAME_DELAY "/tmp/bismark-passive/current-frequent-update-delay"
 #define UPDATE_FILENAME "/tmp/bismark-uploads/passive/%s-%" PRIu64 "-%d.gz"
-#define FREQUENT_UPDATE_FILENAME "/tmp/bismark-uploads/passive-frequent/%s-%d-%d"
+#define FREQUENT_UPDATE_FILENAME "/tmp/bismark-uploads/%s/passive-frequent-wire/%s-%d-%d"
 #define UPLOAD_FAILURES_FILENAME "/tmp/bismark-data-transmit-failures.log"
 //#define FREQUENT_UPDATE_PERIOD_SECONDS 30
 #define NUM_MICROS_PER_SECOND 1e6
@@ -226,10 +225,10 @@ static int print_delay(struct delay_info* delay, int index)
 			if(store[index-i].tcp_next_seq == store[index].tcp_ack)
 			{
 				double tw_data = store[index-i].tv.tv_sec + (double)store[index-i].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
-				double te_data = (double)store[index-i].timestamp/(double)NUM_NANO_PER_SECOND;
-				double tr_ack = (double)store[index].timestamp/(double)NUM_NANO_PER_SECOND;
-				delay->ddelay = te_data - tw_data;
-				delay->udelay = tr_ack - te_data;
+				double tr_ack = store[index].tv.tv_sec + (double)store[index].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
+				delay->time1 = tw_data;
+				delay->time2 = tr_ack;
+				delay->seq = store[index-i].tcp_seq;
 				break;
 			}
 		}
@@ -242,11 +241,11 @@ static int print_delay(struct delay_info* delay, int index)
 		{
 			if(store[index-i].tcp_next_seq == store[index].tcp_ack)
 			{
-				double tr_data = (double)store[index-i].timestamp/(double)NUM_NANO_PER_SECOND;
+				double tw_data = store[index-i].tv.tv_sec + (double)store[index-i].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
 				double tw_ack = store[index].tv.tv_sec + (double)store[index].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
-				double te_ack = (double)store[index].timestamp/(double)NUM_NANO_PER_SECOND;
-				delay->ddelay = te_ack - tw_ack;
-				delay->rtt = tw_ack - tr_data;
+				delay->time1 = tw_data;
+				delay->time2 = tw_ack;
+				delay->seq = store[index-i].tcp_seq;
 				break;
 			}
 		}
@@ -281,10 +280,10 @@ printf("in the write_frequent_update_delay file!\n");
  		switch(direction)
  		{
  			case C2AP_ACK:
- 				fprintf(handle,"%f,%f,\n",delay.udelay,delay.ddelay);
+ 				fprintf(handle,"%lf,%lf,%u\n",delay.time1,delay.time2,delay.tcp_seq);
 				break;
  			case AP2C_ACK:
- 				fprintf(handle,",%f,%f\n",delay.ddelay,delay.rtt);
+ 				fprintf(handle,"%lf,%lf,%u\n",delay.time1,delay.time2,delay.tcp_seq);
 				break;
  			default:
  			/*do nothing*/
@@ -295,14 +294,13 @@ printf("in the write_frequent_update_delay file!\n");
  	}
  /***************************/
 	if(debug == 1)
-	{
-	printf("unlock and fileclose is good!\n");
-	}
+		printf("unlock and fileclose is good!\n");
 /*****************************/
   char update_filename[FILENAME_MAX];
   snprintf(update_filename,
            FILENAME_MAX,
            FREQUENT_UPDATE_FILENAME,
+           mac,
            mac,
            1,
            frequent_sequence_number);
@@ -313,9 +311,7 @@ printf("in the write_frequent_update_delay file!\n");
   
  /************************/
 	if(debug == 1)
-	{
-	printf("rename is good!\n");
-	}
+		printf("rename is good!\n");
 /*************************/
 
   start_timestamp_microseconds
@@ -334,76 +330,6 @@ printf("in the write_frequent_update_delay file!\n");
 
 
 /**************************************/
-
-static void write_frequent_update() {
-  //printf("Writing frequent log to %s\n", PENDING_FREQUENT_UPDATE_FILENAME);
-  FILE* handle = fopen(PENDING_FREQUENT_UPDATE_FILENAME, "w");
- 
-  if (!handle) {
-    perror("Could not open update file for writing\n");
-    exit(1);
-  }
- 
-  /*print out*/
-  	
-	int j = 0;
-	for (j = 0 ; j < CS_NUMBER ;j ++)
-	{
-		if (cs[j].value == 0)
-			break;
-		fprintf(handle,"cs,%lf,%lf,%s,%s,%f\n",
-			inf_start_timestamp,inf_end_timestamp,
-			ether_sprintf(cs[j].wlan_src),ether_sprintf2(cs[j].wlan_dst),cs[j].value);
-	}
-		
-	for (j = 0 ; j < HT_NUMBER ;j ++)
-	{
-		if (ht[j].value == 0)
-			break;
-		fprintf(handle,"ht,%lf,%lf,%s,%s,%f\n",
-			inf_start_timestamp,inf_end_timestamp,
-			ether_sprintf(ht[j].wlan_src),ether_sprintf2(ht[j].wlan_dst),ht[j].value);
-	}
-
-  fclose(handle);
- /***************************/
-	if(debug == 1)
-	{
-	printf("unlock and fileclose is good!\n");
-	}
-/*****************************/
-  char update_filename[FILENAME_MAX];
-  snprintf(update_filename,
-           FILENAME_MAX,
-           FREQUENT_UPDATE_FILENAME,
-           mac,
-           nb->start_timeval.tv_sec,
-           frequent_sequence_number);
-  if (rename(PENDING_FREQUENT_UPDATE_FILENAME, update_filename)) {
-    perror("Could not stage update");
-    exit(1);
-  }
-  
- /************************/
-	if(debug == 1)
-	{
-	printf("rename is good!\n");
-	}
-/*************************/
-
-  start_timestamp_microseconds
-      = nb->start_timeval.tv_sec + nb->start_timeval.tv_usec/NUM_MICROS_PER_SECOND;
-  ++frequent_sequence_number;
-
-    struct pcap_stat statistics;
-    pcap_stats(pcap_handle, &statistics);
-
-	if (debug == 11)
-	{
-		printf("received is: %d,dropped is: %d, total packets are :%d\n",statistics.ps_recv,statistics.ps_drop,rpp);
-	}
-
-}
 
 
 /* libpcap calls this function for every packet it receives. */
@@ -478,7 +404,7 @@ static void process_packet(
 			printf("wireless data packet and loss is:[%d] and [%d]\n",rpp,pch_count_debug);	
 		}
 	}
-	if(debug == 3)
+	if(	)
 		pcap_dump(user,header,bytes);
 	//}//for 136
   
