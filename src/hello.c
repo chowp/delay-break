@@ -228,7 +228,7 @@ static int print_delay(struct delay_info* delay, int index)
 				double tr_ack = store[index].tv.tv_sec + (double)store[index].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
 				delay->time1 = tw_data;
 				delay->time2 = tr_ack;
-				delay->seq = store[index-i].tcp_seq;
+				delay->tcp_seq = store[index-i].tcp_seq;
 				break;
 			}
 		}
@@ -245,7 +245,7 @@ static int print_delay(struct delay_info* delay, int index)
 				double tw_ack = store[index].tv.tv_sec + (double)store[index].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
 				delay->time1 = tw_data;
 				delay->time2 = tw_ack;
-				delay->seq = store[index-i].tcp_seq;
+				delay->tcp_seq = store[index-i].tcp_seq;
 				break;
 			}
 		}
@@ -404,7 +404,7 @@ static void process_packet(
 			printf("wireless data packet and loss is:[%d] and [%d]\n",rpp,pch_count_debug);	
 		}
 	}
-	if(	)
+	if(debug == 3)
 		pcap_dump(user,header,bytes);
 	//}//for 136
   
