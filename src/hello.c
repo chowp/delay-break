@@ -33,12 +33,12 @@ sigset_t block_set;
 #define false 0
 #define true 1
 
-#define DUMP_DIR "/tmp/bismark-passive/w111.cap"
-#define PENDING_UPDATE_FILENAME "/tmp/bismark-passive/current-update.gz"
-#define PENDING_FREQUENT_UPDATE_FILENAME_DELAY "/tmp/bismark-passive/current-frequent-update-delay"
-#define UPDATE_FILENAME "/tmp/bismark-uploads/passive/%s-%" PRIu64 "-%d.gz"
-#define FREQUENT_UPDATE_FILENAME "/tmp/bismark-uploads/%s/passive-frequent-wire/%s-%d-%d"
-#define UPLOAD_FAILURES_FILENAME "/tmp/bismark-data-transmit-failures.log"
+#define DUMP_DIR "/tmp/wifiunion-passive/w111.cap"
+#define PENDING_UPDATE_FILENAME "/tmp/wifiunion-passive/current-update.gz"
+#define PENDING_FREQUENT_UPDATE_FILENAME_DELAY "/tmp/wifiunion-passive/current-frequent-update-delay"
+#define UPDATE_FILENAME "/tmp/wifiunion-uploads/passive/%s-%" PRIu64 "-%d.gz"
+#define FREQUENT_UPDATE_FILENAME "/tmp/wifiunion-uploads/%s/passive-frequent-wire/%s-%d-%d"
+#define UPLOAD_FAILURES_FILENAME "/tmp/wifiunion-data-transmit-failures.log"
 //#define FREQUENT_UPDATE_PERIOD_SECONDS 30
 #define NUM_MICROS_PER_SECOND 1e6
 #define NUM_NANO_PER_SECOND   1e9
