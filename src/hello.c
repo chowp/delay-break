@@ -35,11 +35,11 @@ sigset_t block_set;
 
 #define DUMP_DIR "/tmp/wifiunion-passive/w111.cap"
 #define PENDING_UPDATE_FILENAME "/tmp/wifiunion-passive/current-update.gz"
-#define PENDING_FREQUENT_UPDATE_FILENAME_DELAY "/tmp/wifiunion-passive/current-frequent-update-delay"
+#define PENDING_FREQUENT_UPDATE_FILENAME_DELAY_WIRE "/tmp/wifiunion-passive/update-delay-wire"
 #define UPDATE_FILENAME "/tmp/wifiunion-uploads/passive/%s-%" PRIu64 "-%d.gz"
-#define FREQUENT_UPDATE_FILENAME "/tmp/wifiunion-uploads/%s/passive-frequent-wire/%s-%d-%d"
+#define FREQUENT_UPDATE_FILENAME "/tmp/wifiunion-uploads/%s/wire_data/%s-%d-%d"
 #define UPLOAD_FAILURES_FILENAME "/tmp/wifiunion-data-transmit-failures.log"
-//#define FREQUENT_UPDATE_PERIOD_SECONDS 30
+//#define FREQUENT_UPDATE_PERIOD_SE  CONDS 30
 #define NUM_MICROS_PER_SECOND 1e6
 #define NUM_NANO_PER_SECOND   1e9
 static int hold[HOLD_TIME];
@@ -261,7 +261,7 @@ static int print_delay(struct delay_info* delay, int index)
 /**************************************/
 static int write_frequent_update_delay() {
   //printf("Writing frequent log to %s\n", PENDING_FREQUENT_UPDATE_FILENAME);
-  FILE* handle = fopen(PENDING_FREQUENT_UPDATE_FILENAME_DELAY, "w");
+  FILE* handle = fopen(PENDING_FREQUENT_UPDATE_FILENAME_DELAY_WIRE, "w");
 printf("in the write_frequent_update_delay file!\n"); 
   if (!handle) {
     perror("Could not open update file for writing\n");
@@ -304,7 +304,7 @@ printf("in the write_frequent_update_delay file!\n");
            mac,
            1,
            frequent_sequence_number);
-  if (rename(PENDING_FREQUENT_UPDATE_FILENAME_DELAY, update_filename)) {
+  if (rename(PENDING_FREQUENT_UPDATE_FILENAME_DELAY_WIRE, update_filename)) {
     perror("Could not stage update");
     exit(1);
   }
