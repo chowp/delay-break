@@ -13,6 +13,7 @@
 #include "ieee80211_radiotap.h"
 #include "ieee80211.h"
 #include "hello.h"
+#include 
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <signal.h>
@@ -253,8 +254,8 @@ static int print_delay(struct delay_info* delay, int index)
 				delay->time1 = tw_data;
 				delay->time2 = tr_ack;
 				delay->tcp_seq = store[index-i].tcp_seq;
-				memcpy(delay.wlan_src,store[index-i].wlan_src,MAC_LEN);
-				memcpy(delay.wlan_dst,store[index-i].wlan_dst,MAC_LEN);
+				memcpy(delay.wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
+				memcpy(delay.wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
 				break;
 			}
 		}
@@ -272,8 +273,8 @@ static int print_delay(struct delay_info* delay, int index)
 				delay->time1 = tw_data;
 				delay->time2 = tw_ack;
 				delay->tcp_seq = store[index-i].tcp_seq;
-				memcpy(delay.wlan_src,store[index-i].wlan_src,MAC_LEN);
-				memcpy(delay.wlan_dst,store[index-i].wlan_dst,MAC_LEN);
+				memcpy(delay.wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
+				memcpy(delay.wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
 				break;
 			}
 		}
