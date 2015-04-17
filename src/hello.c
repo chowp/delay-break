@@ -127,17 +127,17 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	p->tcp_ack = ntohl(th->ack_seq);
 	int tcplen = 4*th->doff; /*tcp header len*/
 	double time_pch1 = (double)((double)p->tv.tv_sec + (double)((double)p->tv.tv_usec/1000000.0));
-	if ( (th->ack == 0) && (th->syn == 1) )
+	if ( (th->ack == 0) && (th->syn == 1) && (left_len == tcplen))
 	{
 		p->tcp_type = TCP_SYN;
 		p->tcp_next_seq = p->tcp_seq + 1;
 	}
-	else if ( (th->ack == 1) && (th->syn == 1) )
+	else if ( (th->ack == 1) && (th->syn == 1) && (left_len == tcplen))
 	{
 		p->tcp_type = TCP_SYN_ACK;
 		p->tcp_next_seq = p->tcp_seq + 1;
 	}
-	else if ( (th->ack == 0) && (th->fin == 1)  )
+	else if ( (th->ack == 1) && (th->fin == 1) && (left_len == tcplen) )
 	{
 		p->tcp_type = TCP_FIN_ACK;
 		p->tcp_next_seq = p->tcp_seq + 1;
@@ -157,10 +157,11 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	}
 	else
 	{
+		/*include rst fin*/
 		p->tcp_type = TCP_OTHER;
 	}
 	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
-	printf("tcplen=%d,left_len=%d",tcplen,left_len);
+	printf("tcplen=%d,left_len=%d,",tcplen,left_len);
 	switch(p->tcp_type)
 	{
 		case TCP_ACK:
