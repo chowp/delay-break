@@ -4,10 +4,18 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#define TCP_ACK 1
-#define TCP_NON_ACK 2
+
 #define C2AP_ACK 1
 #define AP2C_ACK 2
+
+#define TCP_SYN 1
+#define TCP_DATA 2
+#define TCP_ACK 3
+#define TCP_SYN_ACK 4
+#define TCP_FIN_ACK 5
+#define TCP_OTHER 0
+
+
 
 #define MAC_LEN			6
 #define HOLD_TIME       60000
@@ -103,6 +111,8 @@ struct delay_info {
 	double time1;
 	double time2;
 	unsigned int tcp_seq;
+	unsigned char wlan_src[MAC_LEN];
+	unsigned char wlan_dst[MAC_LEN];
 };
 struct packet_info {
 	/* general */

@@ -126,21 +126,43 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	p->tcp_seq = ntohl(th->seq);
 	p->tcp_ack = ntohl(th->ack_seq);
 	int tcplen = 4*th->doff; /*tcp header len*/
-	p->tcp_next_seq = p->tcp_seq + left_len - tcplen;
 	double time_pch1 = (double)((double)p->tv.tv_sec + (double)((double)p->tv.tv_usec/1000000.0));
-	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
-	printf("tcplen=%d,left_len=%d\n",tcplen,left_len);
-	if ((th->ack == 1) && (left_len == tcplen) )
+	if ( (th->ack == 0) && (th->syn == 1) )
 	{
-		p->tcp_type = TCP_ACK;
-		return TCP_ACK;
+		p->tcp_type = TCP_SYN;
+		p->tcp_next_seq = p->tcp_seq + 1;
+	}
+	else if ( (th->ack == 1) && (th->syn == 1) )
+	{
+		p->tcp_type = TCP_SYN_ACK;
+		p->tcp_next_seq = p->tcp_seq + 1;
+	}
+	else if ( (th->ack == 0) && (th->fin == 1)  )
+	{
+		p->tcp_type = TCP_FIN_ACK;
+		p->tcp_next_seq = p->tcp_seq + 1;
+	}
+	else if ( (th->ack == 1) && (th->fin == 0) && (th->syn == 0))
+	{
+		if(left_len == tcplen)
+		{
+			p->tcp_type = TCP_ACK;
+			p->tcp_next_seq = p->tcp_seq + 1;
+		}
+		else
+		{
+			p->tcp_type = TCP_DATA;
+			p->tcp_next_seq = p->tcp_seq + left_len - tcplen;		
+		}
 	}
 	else
-	{ 
-		p->tcp_type = TCP_NON_ACK;
-		return TCP_NON_ACK;
+	{
+		p->tcp_type = TCP_OTHER;
 	}
-
+	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
+	printf("tcplen=%d,left_len=%d\n",tcplen,left_len);
+	
+	return 0;
 }
 /* return 1 if we parsed enough = min ieee header */
 int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
@@ -156,7 +178,8 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 		
 		p->tcp_offset = 14 + ipl;
 		int left_len = p->len - 14 - ipl;
-		parse_tcp_header(buf+p->tcp_offset,p,left_len);
+		if (ih && ih->protocol && (ih->protocol == IPPROTO_TCP))
+			parse_tcp_header(buf+p->tcp_offset,p,left_len);
 	}else{
 		p->tcp_offset = 14 + IPV6; //ipv6
 		/*need to be continue...*/
@@ -217,6 +240,7 @@ void reset_one_line(int j)
 
 static int print_delay(struct delay_info* delay, int index)
 {
+	/*note: we discard the delay using syn-ack and fin-ack*/
 	if( (store[index].tcp_type == TCP_ACK ) && (str_equal(mac,ether_sprintf(p.wlan_dst),2*MAC_LEN) == 1) )
 	{
 		int i ;
@@ -229,6 +253,8 @@ static int print_delay(struct delay_info* delay, int index)
 				delay->time1 = tw_data;
 				delay->time2 = tr_ack;
 				delay->tcp_seq = store[index-i].tcp_seq;
+				memcpy(delay.wlan_src,store[index-i].wlan_src,MAC_LEN);
+				memcpy(delay.wlan_dst,store[index-i].wlan_dst,MAC_LEN);
 				break;
 			}
 		}
@@ -246,6 +272,8 @@ static int print_delay(struct delay_info* delay, int index)
 				delay->time1 = tw_data;
 				delay->time2 = tw_ack;
 				delay->tcp_seq = store[index-i].tcp_seq;
+				memcpy(delay.wlan_src,store[index-i].wlan_src,MAC_LEN);
+				memcpy(delay.wlan_dst,store[index-i].wlan_dst,MAC_LEN);
 				break;
 			}
 		}
@@ -254,6 +282,7 @@ static int print_delay(struct delay_info* delay, int index)
 	else
 	{
 		/*do nothing*/
+		return 0;
 	}
 }
 
@@ -280,10 +309,10 @@ printf("in the write_frequent_update_delay file!\n");
  		switch(direction)
  		{
  			case C2AP_ACK:
- 				fprintf(handle,"%lf,%lf,%u\n",delay.time1,delay.time2,delay.tcp_seq);
+ 				fprintf(handle,"%lf,%lf,%s,%s,%u\n",delay.time1,delay.time2,ether_sprintf(delay.wlan_src),ether_sprintf2(p.wlan_dst),delay.tcp_seq);
 				break;
  			case AP2C_ACK:
- 				fprintf(handle,"%lf,%lf,%u\n",delay.time1,delay.time2,delay.tcp_seq);
+ 				fprintf(handle,"%lf,%lf,%s,%s,%u\n",delay.time1,delay.time2,ether_sprintf(delay.wlan_src),ether_sprintf2(p.wlan_dst),delay.tcp_seq);
 				break;
  			default:
  			/*do nothing*/
