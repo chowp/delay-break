@@ -178,7 +178,7 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 		
 		p->tcp_offset = 14 + ipl;
 		int left_len = p->len - 14 - ipl;
-		if (ih && ih->ip_p && (ih->ip_p == IPPROTO_TCP))
+		if (ih && ih->ip_p && (ih->ip_p  == IPPROTO_TCP))
 			parse_tcp_header(buf+p->tcp_offset,p,left_len);
 	}else{
 		p->tcp_offset = 14 + IPV6; //ipv6
@@ -253,8 +253,8 @@ static int print_delay(struct delay_info* delay, int index)
 				delay->time1 = tw_data;
 				delay->time2 = tr_ack;
 				delay->tcp_seq = store[index-i].tcp_seq;
-				memcpy(delay.wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
-				memcpy(delay.wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
+				memcpy(delay->wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
+				memcpy(delay->wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
 				break;
 			}
 		}
@@ -272,8 +272,8 @@ static int print_delay(struct delay_info* delay, int index)
 				delay->time1 = tw_data;
 				delay->time2 = tw_ack;
 				delay->tcp_seq = store[index-i].tcp_seq;
-				memcpy(delay.wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
-				memcpy(delay.wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
+				memcpy(delay->wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
+				memcpy(delay->wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
 				break;
 			}
 		}
