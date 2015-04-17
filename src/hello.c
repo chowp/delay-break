@@ -161,7 +161,7 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	}
 	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
 	printf("tcplen=%d,left_len=%d",tcplen,left_len);
-	switch(p->tcp_type):
+	switch(p->tcp_type)
 	{
 		case TCP_ACK:
 			printf("TCP_ACK\n");
