@@ -160,7 +160,30 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 		p->tcp_type = TCP_OTHER;
 	}
 	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
-	printf("tcplen=%d,left_len=%d\n",tcplen,left_len);
+	printf("tcplen=%d,left_len=%d",tcplen,left_len);
+	switch(p->tcp_type):
+	{
+		case TCP_ACK:
+			printf("TCP_ACK\n");
+			break;
+		case TCP_DATA:
+			printf("TCP_DATA\n");
+			break;
+		case TCP_SYN:
+			printf("TCP_SYN\n");
+			break;
+		case TCP_FIN_ACK:
+			printf("TCP_FIN_ACK\n");
+			break;
+		case TCP_SYN_ACK:
+			printf("TCP_SYN_ACK\n");
+			break;
+		case TCP_OTHER:
+			printf("TCP_OTHER\n");
+			break;
+		default:
+			break;
+	}
 	
 	return 0;
 }
