@@ -127,8 +127,8 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	p->tcp_ack = ntohl(th->ack_seq);
 	int tcplen = 4*th->doff; /*tcp header len*/
 	p->tcp_next_seq = p->tcp_seq + left_len - tcplen;
-	
-	printf("seq=%u,ack=%u,nex_seq=%u",p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
+	double time_pch1 = (double)((double)store[j].tv.tv_sec + (double)((double)store[j].tv.tv_usec/1000000.0));
+	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
 	printf("tcplen=%d,left_len=%d\n",tcplen,left_len);
 	if ((th->ack == 1) && (left_len == tcplen) )
 	{
@@ -345,23 +345,15 @@ static void process_packet(
 //	int i = 0;
 	float busywait = 0;
   ++rp;
-	//if(debug == 1)
-	//	printf("receive %d packets\n",rp);
+
 
 	memset(&p, 0, sizeof(p));
 	p.len = header->len;
-	parse_wire_packet(bytes,&p);
-	
-	//fiter
-	//if((str_equal(mac,ether_sprintf(p.wlan_src),2*MAC_LEN) != 1))
-	//{
-	//	return;
-	//}
-
-
 	p.tv.tv_sec = header->ts.tv_sec;
 	p.tv.tv_usec = header->ts.tv_usec;
 	rpp++;
+	parse_wire_packet(bytes,&p);
+	
 
 	/*begin store packet*/
 	memcpy(store[rpp%HOLD_TIME].tcp_header,bytes+p.tcp_offset,16);
@@ -375,6 +367,10 @@ static void process_packet(
 	store[rpp%HOLD_TIME].phy_signal = p.phy_signal;
 	store[rpp%HOLD_TIME].phy_rate = p.phy_rate;
 	store[rpp%HOLD_TIME].timestamp = p.timestamp;
+	store[rpp%HOLD_TIME].tcp_seq = p.tcp_seq;
+	store[rpp%HOLD_TIME].tcp_next_seq = p.tcp_next_seq;
+	store[rpp%HOLD_TIME].ack_seq = p.ack_seq;
+	
 	pj = rpp%HOLD_TIME;
 	end_pointer = rpp%HOLD_TIME;
 	if(debug == 1)
