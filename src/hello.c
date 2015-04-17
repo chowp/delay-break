@@ -127,7 +127,7 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	p->tcp_ack = ntohl(th->ack_seq);
 	int tcplen = 4*th->doff; /*tcp header len*/
 	p->tcp_next_seq = p->tcp_seq + left_len - tcplen;
-	double time_pch1 = (double)((double)store[j].tv.tv_sec + (double)((double)store[j].tv.tv_usec/1000000.0));
+	double time_pch1 = (double)((double)p->tv.tv_sec + (double)((double)p->tv.tv_usec/1000000.0));
 	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
 	printf("tcplen=%d,left_len=%d\n",tcplen,left_len);
 	if ((th->ack == 1) && (left_len == tcplen) )
