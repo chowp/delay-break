@@ -13,7 +13,6 @@
 #include "ieee80211_radiotap.h"
 #include "ieee80211.h"
 #include "hello.h"
-#include 
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <signal.h>
@@ -179,7 +178,7 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 		
 		p->tcp_offset = 14 + ipl;
 		int left_len = p->len - 14 - ipl;
-		if (ih && ih->protocol && (ih->protocol == IPPROTO_TCP))
+		if (ih && ih->ip_p && (ih->ip_p == IPPROTO_TCP))
 			parse_tcp_header(buf+p->tcp_offset,p,left_len);
 	}else{
 		p->tcp_offset = 14 + IPV6; //ipv6
