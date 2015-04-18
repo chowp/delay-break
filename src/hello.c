@@ -340,7 +340,6 @@ static int print_delay(struct delay_info* delay, int index)
 static int write_frequent_update_delay() {
   //printf("Writing frequent log to %s\n", PENDING_FREQUENT_UPDATE_FILENAME);
   FILE* handle = fopen(PENDING_FILE, "w");
-printf("in the write_frequent_update_delay file!\n"); 
   if (!handle) {
     perror("Could not open update file for writing\n");
     exit(1);
@@ -360,7 +359,7 @@ printf("in the write_frequent_update_delay file!\n");
  			
  			double time_pch1 = (double)((double)store[ii].tv.tv_sec + (double)((double)store[ii].tv.tv_usec/1000000.0));
  			fprintf(handle,"%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
- 			printf("%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
+ 			//printf("%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
  		
  		}
  		i = (i+1);
@@ -378,7 +377,6 @@ printf("in the write_frequent_update_delay file!\n");
            mac,
            1,
            frequent_sequence_number);
-  printf("%s\n",update_filename);
   if (rename(PENDING_FILE,update_filename)) {
     perror("Could not stage update");
     exit(1);
@@ -464,7 +462,6 @@ static void process_packet(
 	if ((inf_end_timestamp - delay_start_timestamp) > FREQUENT_UPDATE_DELAY_SECONDS)
 	{
 		/*print out*/
-		printf("begin print...\n");
 		write_frequent_update_delay(); /*write the delay into the file*/
 		delay_start_timestamp = inf_end_timestamp;
 	}
