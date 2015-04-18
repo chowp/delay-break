@@ -34,7 +34,7 @@ sigset_t block_set;
 #define true 1
 
 #define DUMP_DIR "/tmp/wifiunion-passive/w111.cap"
-#define PENDING_FREQUENT_UPDATE_FILENAME_DELAY_WIRE "/tmp/wifiunion-passive/update-delay-wire"
+#define PENDING_FILE "/tmp/wifiunion-passive/update-delay-wire"
 #define FREQUENT_UPDATE_FILENAME "/tmp/wifiunion-uploads/%s/wire_data/%s-%d-%d"
 //#define FREQUENT_UPDATE_PERIOD_SE  CONDS 30
 #define NUM_MICROS_PER_SECOND 1e6
@@ -311,7 +311,7 @@ static int print_delay(struct delay_info* delay, int index)
 /**************************************/
 static int write_frequent_update_delay() {
   //printf("Writing frequent log to %s\n", PENDING_FREQUENT_UPDATE_FILENAME);
-  FILE* handle = fopen(PENDING_FREQUENT_UPDATE_FILENAME_DELAY_WIRE, "w");
+  FILE* handle = fopen(PENDING_FILE, "w");
 printf("in the write_frequent_update_delay file!\n"); 
   if (!handle) {
     perror("Could not open update file for writing\n");
@@ -354,7 +354,8 @@ printf("in the write_frequent_update_delay file!\n");
            mac,
            1,
            frequent_sequence_number);
-  if (rename(PENDING_FREQUENT_UPDATE_FILENAME_DELAY_WIRE, update_filename)) {
+  printf("%s\n",update_filename);
+  if (rename(PENDING_FILE,update_filename)) {
     perror("Could not stage update");
     exit(1);
   }
