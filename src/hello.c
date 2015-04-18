@@ -139,6 +139,18 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 		p->tcp_type = TCP_FIN_ACK;
 		p->tcp_next_seq = p->tcp_seq + 1;
 	}
+	else if ( (th->ack == 1) && (th->fin == 1) && (left_len != tcplen) )
+	{
+		p->tcp_type = TCP_FIN_ACK;
+	}
+	else if ( (th->ack == 0) && (th->fin == 1) )
+	{
+		p->tcp_type = TCP_FIN;
+	}
+	else if ( (th->ack == 0) && (th->rst == 1) )
+	{
+		p->tcp_type = TCP_RST;
+	}
 	else if ( (th->ack == 1) && (th->fin == 0) && (th->syn == 0))
 	{
 		if(left_len == tcplen)
@@ -199,6 +211,8 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 		
 		p->tcp_offset = 14 + ipl;
 		int left_len = p->len - 14 - ipl;
+		p->srcIP = ih->ip_src.s_addr;
+		p->dstIP = ih->ip_dst.s_addr;
 		if (ih && ih->ip_p && (ih->ip_p  == IPPROTO_TCP))
 			parse_tcp_header(buf+p->tcp_offset,p,left_len);
 	}else{
@@ -323,21 +337,10 @@ printf("in the write_frequent_update_delay file!\n");
  	printf("from %d to %d, rounds is %d\n",start_pointer,rpp,rounds);
  	while(i < rounds )
  	{
-		
- 		struct delay_info delay;
- 		int direction = print_delay(&delay,ii);
-		//printf("direction is:%d,ii is :%d",direction,ii);
- 		switch(direction)
+ 		if(store[ii].tcp_type != 0)
  		{
- 			case C2AP_ACK:
- 				fprintf(handle,"%lf,%lf,%s,%s,%u\n",delay.time1,delay.time2,ether_sprintf(delay.wlan_src),ether_sprintf2(p.wlan_dst),delay.tcp_seq);
-				break;
- 			case AP2C_ACK:
- 				fprintf(handle,"%lf,%lf,%s,%s,%u\n",delay.time1,delay.time2,ether_sprintf(delay.wlan_src),ether_sprintf2(p.wlan_dst),delay.tcp_seq);
-				break;
- 			default:
- 			/*do nothing*/
-				break;
+ 			double time_pch1 = (double)((double)store[ii].tv.tv_sec + (double)((double)store[ii].tv.tv_usec/1000000.0));
+ 			fprintf(handle,"%lf,%u,%u,%s,%s,%d,%d,%d,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].tcp_type);
  		}
  		i = (i+1);
  		ii = (ii+1)%HOLD_TIME;

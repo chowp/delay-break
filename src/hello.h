@@ -13,7 +13,9 @@
 #define TCP_ACK 3
 #define TCP_SYN_ACK 4
 #define TCP_FIN_ACK 5
-#define TCP_OTHER 0
+#define TCP_FIN 6
+#define TCP_RST 7
+#define TCP_OTHER 8
 
 
 
@@ -131,6 +133,8 @@ struct packet_info {
 	u16		wlan_type;	/* frame control field */
 	unsigned char		wlan_src[MAC_LEN];
 	unsigned char		wlan_dst[MAC_LEN];
+	unsigned int srcIP;
+	unsigned int dstIP;
 	int        tcp_offset;
 	int tcp_type;
 	unsigned int tcp_seq;
