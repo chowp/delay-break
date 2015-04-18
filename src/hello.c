@@ -204,6 +204,15 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 	
 
 	u8 *raw = (u8 *)(buf+14);
+	u8* sa = NULL;
+	u8* da = NULL; 
+	if (sa != NULL) {
+		memcpy(p->wlan_src, buf, MAC_LEN);
+	}
+	if (da != NULL) {
+		memcpy(p->wlan_dst, buf + 6, MAC_LEN);
+	}
+
 	if(((*raw) & 0x60) == 0x40){
 		struct ip* ih;
 		ih = (struct ip*)(buf+14);
@@ -337,10 +346,10 @@ printf("in the write_frequent_update_delay file!\n");
  	printf("from %d to %d, rounds is %d\n",start_pointer,rpp,rounds);
  	while(i < rounds )
  	{
- 		if(store[ii].tcp_type != 0)
+ 		if(store[ii].tcp_type != -1)
  		{
  			double time_pch1 = (double)((double)store[ii].tv.tv_sec + (double)((double)store[ii].tv.tv_usec/1000000.0));
- 			fprintf(handle,"%lf,%u,%u,%s,%s,%d,%d,%d,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].tcp_type);
+ 			fprintf(handle,"%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
  		}
  		i = (i+1);
  		ii = (ii+1)%HOLD_TIME;
@@ -406,6 +415,7 @@ static void process_packet(
 	p.tv.tv_sec = header->ts.tv_sec;
 	p.tv.tv_usec = header->ts.tv_usec;
 	rpp++;
+	p.wlan_type = -1;
 	parse_wire_packet(bytes,&p);
 	
 
