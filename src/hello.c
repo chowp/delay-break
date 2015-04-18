@@ -423,6 +423,9 @@ static void process_packet(
 	store[rpp%HOLD_TIME].timestamp = p.timestamp;
 	store[rpp%HOLD_TIME].tcp_seq = p.tcp_seq;
 	store[rpp%HOLD_TIME].tcp_next_seq = p.tcp_next_seq;
+	store[rpp%HOLD_TIME].tcp_ack = p.tcp_ack;
+	store[rpp%HOLD_TIME].tcp_type = p.tcp_type;
+	
 	
 	pj = rpp%HOLD_TIME;
 	end_pointer = rpp%HOLD_TIME;
