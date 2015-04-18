@@ -111,6 +111,15 @@ ether_sprintf2(const unsigned char *mac)
 	return etherbuf2;
 }
 
+const char*
+ip_sprintf(const unsigned int ip)
+{
+	static char ipbuf[18];
+	unsigned char* cip = (unsigned char*)&ip;
+	snprintf(ipbuf, sizeof(ipbuf), "%d.%d.%d.%d",
+		cip[0], cip[1], cip[2], cip[3]);
+	return ipbuf;
+}
 
 
 int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_len)
@@ -169,7 +178,7 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 		/*include rst fin*/
 		p->tcp_type = TCP_OTHER;
 	}
-	printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
+	/*printf("%lf,seq=%u,ack=%u,nex_seq=%u,",time_pch1,p->tcp_seq,p->tcp_ack,p->tcp_next_seq);
 	printf("tcplen=%d,left_len=%d,",tcplen,left_len);
 	switch(p->tcp_type)
 	{
@@ -193,7 +202,7 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 			break;
 		default:
 			break;
-	}
+	}*/
 	
 	return 0;
 }
@@ -348,6 +357,11 @@ printf("in the write_frequent_update_delay file!\n");
  	{
  		if(store[ii].tcp_type != -1)
  		{
+ 			printf("*** IP SRC: %s\n", ip_sprintf(store[ii].srcIP);
+ 			printf("*** IP DST: %s\n", ip_sprintf(store[ii].dstIP);
+ 			printf("*** MAC src: %s\n", ether_sprintf(store[ii].wlan_src);
+ 			printf("*** MAC dst: %s\n", ether_sprintf(store[ii].wlan_dst);
+ 			
  			double time_pch1 = (double)((double)store[ii].tv.tv_sec + (double)((double)store[ii].tv.tv_usec/1000000.0));
  			fprintf(handle,"%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
  		}
@@ -426,15 +440,13 @@ static void process_packet(
 	store[rpp%HOLD_TIME].tv.tv_sec = p.tv.tv_sec;
 	store[rpp%HOLD_TIME].tv.tv_usec = p.tv.tv_usec;
 	store[rpp%HOLD_TIME].len = p.len;
-	store[rpp%HOLD_TIME].wlan_type = p.wlan_type;
-	store[rpp%HOLD_TIME].wlan_retry = p.wlan_retry;
-	store[rpp%HOLD_TIME].phy_signal = p.phy_signal;
-	store[rpp%HOLD_TIME].phy_rate = p.phy_rate;
 	store[rpp%HOLD_TIME].timestamp = p.timestamp;
 	store[rpp%HOLD_TIME].tcp_seq = p.tcp_seq;
 	store[rpp%HOLD_TIME].tcp_next_seq = p.tcp_next_seq;
 	store[rpp%HOLD_TIME].tcp_ack = p.tcp_ack;
 	store[rpp%HOLD_TIME].tcp_type = p.tcp_type;
+	store[rpp%HOLD_TIME].srcIP = p.srcIP;
+	store[rpp%HOLD_TIME].dstIP = p.dstIP;
 	
 	
 	pj = rpp%HOLD_TIME;
