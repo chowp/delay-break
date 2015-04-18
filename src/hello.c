@@ -214,8 +214,8 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 
 	u8 *raw = (u8 *)(buf+14);
 	u8 *hdr = (u8 *)buf;
-	memcpy(p->wlan_src,hdr, MAC_LEN);
-	memcpy(p->wlan_dst,hdr+ 6, MAC_LEN);
+	memcpy(p->wlan_src,hdr+6, MAC_LEN);
+	memcpy(p->wlan_dst,hdr, MAC_LEN);
 	
 
 	if(((*raw) & 0x60) == 0x40){
@@ -427,7 +427,7 @@ static void process_packet(
 	p.tv.tv_sec = header->ts.tv_sec;
 	p.tv.tv_usec = header->ts.tv_usec;
 	rpp++;
-	p.wlan_type = -1;
+	p.tcp_type = -1;
 	parse_wire_packet(bytes,&p);
 	
 
