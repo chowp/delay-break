@@ -353,13 +353,15 @@ printf("in the write_frequent_update_delay file!\n");
  	{
  		if(store[ii].tcp_type != -1)
  		{
- 			printf("*** IP SRC: %s\n", ip_sprintf(store[ii].srcIP));
- 			printf("*** IP DST: %s\n", ip_sprintf(store[ii].dstIP));
- 			printf("*** MAC src: %s\n", ether_sprintf(store[ii].wlan_src));
- 			printf("*** MAC dst: %s\n", ether_sprintf(store[ii].wlan_dst));
+ 			//printf("*** IP SRC: %s\n", ip_sprintf(store[ii].srcIP));
+ 			//printf("*** IP DST: %s\n", ip_sprintf(store[ii].dstIP));
+ 			//printf("*** MAC src: %s\n", ether_sprintf(store[ii].wlan_src));
+ 			//printf("*** MAC dst: %s\n", ether_sprintf(store[ii].wlan_dst));
  			
  			double time_pch1 = (double)((double)store[ii].tv.tv_sec + (double)((double)store[ii].tv.tv_usec/1000000.0));
  			fprintf(handle,"%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
+ 			printf("%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
+ 		
  		}
  		i = (i+1);
  		ii = (ii+1)%HOLD_TIME;
