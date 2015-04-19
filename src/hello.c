@@ -344,7 +344,8 @@ static int write_frequent_update_delay() {
     perror("Could not open update file for writing\n");
     exit(1);
   }
- 	int rounds =(rpp - start_pointer + HOLD_TIME )%HOLD_TIME;
+   end_pointer = rpp%HOLD_TIME;
+ 	int rounds =(end_pointer - start_pointer + HOLD_TIME )%HOLD_TIME;
  	int i = 0;
  	int ii = start_pointer;
  	//printf("from %d to %d, rounds is %d\n",start_pointer,rpp,rounds);
@@ -398,7 +399,7 @@ static int write_frequent_update_delay() {
 	{
 		printf("received is: %d,dropped is: %d, total packets are :%d\n",statistics.ps_recv,statistics.ps_drop,rpp);
 	}
-	start_pointer = rpp;
+	start_pointer = rpp%HOLD_TIME;
 }
 
 
