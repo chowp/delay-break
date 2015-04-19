@@ -347,8 +347,7 @@ static int write_frequent_update_delay() {
    end_pointer = rpp%HOLD_TIME;
  	int rounds =(end_pointer - start_pointer + HOLD_TIME )%HOLD_TIME;
  	int i = 0;
- 	int ii = start_pointer;
- 	//printf("from %d to %d, rounds is %d\n",start_pointer,rpp,rounds);
+ 	int ii = (start_pointer+1)%HOLD_TIME;
  	while(i < rounds )
  	{
  		if(store[ii].tcp_type != -1)
@@ -366,6 +365,9 @@ static int write_frequent_update_delay() {
  		i = (i+1);
  		ii = (ii+1)%HOLD_TIME;
  	}
+
+ 	if(debug == -1)
+ 		printf("from %d to %d, rounds is %d,last is %d\n",start_pointer,end_pointer,rounds,ii-1);
  /***************************/
 	if(debug == 1)
 		printf("unlock and fileclose is good!\n");
