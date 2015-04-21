@@ -45,6 +45,7 @@ static int FREQUENT_UPDATE_DELAY_SECONDS;
 
 static unsigned char bismark_id[MAC_LEN];
 static char mac[12];
+static char wmac[12];
 static char mac_zero[12] = "000000000000";
 static char mac_ffff[12] = "FFFFFFFFFFFF";
 static int frequent_sequence_number = 0;
@@ -287,54 +288,6 @@ void reset_one_line(int j)
 }
 
 
-static int print_delay(struct delay_info* delay, int index)
-{
-	/*note: we discard the delay using syn-ack and fin-ack*/
-	if( (store[index].tcp_type == TCP_ACK ) && (str_equal(mac,ether_sprintf(p.wlan_dst),2*MAC_LEN) == 1) )
-	{
-		int i ;
-		for(i = 1;i <5; i++)
-		{
-			if(store[index-i].tcp_next_seq == store[index].tcp_ack)
-			{
-				double tw_data = store[index-i].tv.tv_sec + (double)store[index-i].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
-				double tr_ack = store[index].tv.tv_sec + (double)store[index].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
-				delay->time1 = tw_data;
-				delay->time2 = tr_ack;
-				delay->tcp_seq = store[index-i].tcp_seq;
-				memcpy(delay->wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
-				memcpy(delay->wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
-				break;
-			}
-		}
-		return C2AP_ACK;
-	}
-	else if( (store[index].tcp_type == TCP_ACK) && (str_equal(mac,ether_sprintf(p.wlan_src),2*MAC_LEN) == 1) )
-	{
-		int i ;
-		for(i = 1;i <5; i++)
-		{
-			if(store[index-i].tcp_next_seq == store[index].tcp_ack)
-			{
-				double tw_data = store[index-i].tv.tv_sec + (double)store[index-i].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
-				double tw_ack = store[index].tv.tv_sec + (double)store[index].tv.tv_usec/(double)NUM_MICROS_PER_SECOND;
-				delay->time1 = tw_data;
-				delay->time2 = tw_ack;
-				delay->tcp_seq = store[index-i].tcp_seq;
-				memcpy(delay->wlan_src,ether_sprintf(store[index-i].wlan_src),MAC_LEN);
-				memcpy(delay->wlan_dst,ether_sprintf2(store[index-i].wlan_dst),MAC_LEN);
-				break;
-			}
-		}
-		return AP2C_ACK;
-	}
-	else
-	{
-		/*do nothing*/
-		return 0;
-	}
-}
-
 
 /**************************************/
 static int write_frequent_update_delay() {
@@ -378,7 +331,7 @@ static int write_frequent_update_delay() {
            FILENAME_MAX,
            FREQUENT_UPDATE_FILENAME,
            mac,
-           mac,
+           wmac,
            file_time,
            frequent_sequence_number);
   if (rename(PENDING_FILE,update_filename)) {
@@ -557,7 +510,8 @@ int main(int argc,char *argv[]){
 	printf("hello world\n");
 	printf("%s\n",argv[1]);
 	debug = atoi(argv[2]);
-	FREQUENT_UPDATE_PERIOD_SECONDS = atoi(argv[3]);
+	memcpy(wmac,argv[3],12);
+	printf("%s\n",wmac);
 	memcpy(mac,argv[4],12);
 	printf("%s\n",mac);
 	every = atoi(argv[5]);
