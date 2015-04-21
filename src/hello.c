@@ -372,13 +372,14 @@ static int write_frequent_update_delay() {
 	if(debug == 1)
 		printf("unlock and fileclose is good!\n");
 /*****************************/
+	int file_time = (int)inf_end_timestamp;
   char update_filename[FILENAME_MAX];
   snprintf(update_filename,
            FILENAME_MAX,
            FREQUENT_UPDATE_FILENAME,
            mac,
            mac,
-           1,
+           file_time,
            frequent_sequence_number);
   if (rename(PENDING_FILE,update_filename)) {
     perror("Could not stage update");
