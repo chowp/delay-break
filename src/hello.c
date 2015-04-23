@@ -328,11 +328,16 @@ static int write_frequent_update_delay() {
 /*****************************/
 	int file_time = (int)inf_end_timestamp;
   char update_filename[FILENAME_MAX];
+  printf("wmac is %s,",wmac);
+  printf("mac is %s\n",mac);
+  char mac_tmp[MAC_LEN];
+  memcpy(mac_tmp,wmac,MAC_LEN);
+  printf("mac_tmp is %s",mac_tmp);
   snprintf(update_filename,
            FILENAME_MAX,
            FREQUENT_UPDATE_FILENAME,
            mac,
-           wmac,
+           mac_tmp,
            file_time,
            frequent_sequence_number);
   if (rename(PENDING_FILE,update_filename)) {
