@@ -153,10 +153,12 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	else if ( (th->ack == 1) && (th->fin == 1) && (left_len != tcplen) )
 	{
 		p->tcp_type = TCP_FIN_ACK;
+		p->tcp_next_seq = p->tcp_seq;
 	}
 	else if ( (th->ack == 0) && (th->fin == 1) )
 	{
 		p->tcp_type = TCP_FIN;
+		p->tcp_next_seq = p->tcp_seq;
 	}
 	else if ( (th->ack == 0) && (th->rst == 1) )
 	{
