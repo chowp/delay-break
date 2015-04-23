@@ -332,7 +332,7 @@ static int write_frequent_update_delay() {
            FILENAME_MAX,
            FREQUENT_UPDATE_FILENAME,
            mac,
-           wmac,
+           ether_sprintf(wmac),
            file_time,
            frequent_sequence_number);
   if (rename(PENDING_FILE,update_filename)) {
