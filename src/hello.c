@@ -133,7 +133,6 @@ int parse_tcp_header(const unsigned char *buf, struct packet_info* p,int left_le
 	p->tcp_seq = ntohl(th->seq);
 	p->tcp_ack = ntohl(th->ack_seq);
 	int tcplen = 4*th->doff; /*tcp header len*/
-	p->tcp_hdrlen = tcplen;
 	double time_pch1 = (double)((double)p->tv.tv_sec + (double)((double)p->tv.tv_usec/1000000.0));
 	if ( (th->ack == 0) && (th->syn == 1) && (left_len == tcplen))
 	{
@@ -226,7 +225,7 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 		struct ip* ih;
 		ih = (struct ip*)(buf+14);
 		int ipl = ih->ip_hl*4;
-		
+		p->ip_totlen = ntohs(ih->tot_len);
 		p->tcp_offset = 14 + ipl;
 		int left_len = p->len - 14 - ipl;
 		p->srcIP = ih->ip_src.s_addr;
@@ -314,7 +313,7 @@ static int write_frequent_update_delay() {
  			//printf("*** MAC dst: %s\n", ether_sprintf(store[ii].wlan_dst));
  			
  			double time_pch1 = (double)((double)store[ii].tv.tv_sec + (double)((double)store[ii].tv.tv_usec/1000000.0));
- 			fprintf(handle,"%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type,store[ii].tcp_hdrlen);
+ 			fprintf(handle,"%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type,store[ii].ip_totlen);
  			//printf("%lf,%u,%u,%s,%s,%u,%u,%u,%d,%d\n",time_pch1,store[ii].srcIP,store[ii].dstIP,ether_sprintf(store[ii].wlan_src),ether_sprintf2(store[ii].wlan_dst),store[ii].tcp_seq,store[ii].tcp_next_seq,store[ii].tcp_ack,store[ii].len,store[ii].tcp_type);
  		
  		}
@@ -404,7 +403,7 @@ static void process_packet(
 	store[rpp%HOLD_TIME].tcp_type = p.tcp_type;
 	store[rpp%HOLD_TIME].srcIP = p.srcIP;
 	store[rpp%HOLD_TIME].dstIP = p.dstIP;
-	store[rpp%HOLD_TIME].tcp_hdrlen = p.tcp_hdrlen;
+	store[rpp%HOLD_TIME].ip_totlen = p.ip_totlen;
 	
 	
 	pj = rpp%HOLD_TIME;
