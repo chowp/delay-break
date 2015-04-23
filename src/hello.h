@@ -136,6 +136,7 @@ struct packet_info {
 	unsigned int srcIP;
 	unsigned int dstIP;
 	int        tcp_offset;
+	int tcp_hdrlen;
 	int tcp_type;
 	unsigned int tcp_seq;
 	unsigned int tcp_ack;
