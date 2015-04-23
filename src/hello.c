@@ -328,11 +328,8 @@ static int write_frequent_update_delay() {
 /*****************************/
 	int file_time = (int)inf_end_timestamp;
   char update_filename[FILENAME_MAX];
-  printf("wmac is %s,",wmac);
-  printf("mac is %s\n",mac);
-  char mac_tmp[MAC_LEN];
-  memcpy(mac_tmp,wmac,MAC_LEN);
-  printf("mac_tmp is %s",mac_tmp);
+  char mac_tmp[2*MAC_LEN+1];
+  memcpy(mac_tmp,wmac,2*MAC_LEN);
   snprintf(update_filename,
            FILENAME_MAX,
            FREQUENT_UPDATE_FILENAME,
