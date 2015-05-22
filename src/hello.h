@@ -121,6 +121,7 @@ struct packet_info {
 	struct timeval tv;
 	unsigned short int ip_id;
 	unsigned short int ip_off;
+	int len;
 	/*wlan phy*/
 	int phy_signal;
 	int phy_noise;
