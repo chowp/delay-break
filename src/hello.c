@@ -226,8 +226,8 @@ int parse_wire_packet(const unsigned char *buf,  struct packet_info* p)
 		ih = (struct ip*)(buf+14);
 		int ipl = ih->ip_hl*4;
 		p->ip_totlen = ntohs(ih->ip_len);
-		p->ip_id = ntohs(ih->ip_id);
-		p->ip_off = ntohs(ih->ip_off);
+		p->ip_id = ntohs(ih->id);
+		p->ip_off = ntohs(ih->frag_off);
 		p->tcp_offset = 14 + ipl;
 		int left_len = p->len - 14 - ipl;
 		p->srcIP = ih->ip_src.s_addr;
