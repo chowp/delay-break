@@ -119,7 +119,8 @@ struct delay_info {
 struct packet_info {
 	/* general */
 	struct timeval tv;
-	int len;
+	unsigned short int ip_id;
+	unsigned short int ip_off;
 	/*wlan phy*/
 	int phy_signal;
 	int phy_noise;
